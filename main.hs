@@ -8,8 +8,8 @@ main = do
        let caracteristicas = formataEntrada entradaDescricao
        let exemplos = formataEntrada entradaBase
        let classes = sort (separaClasses exemplos)
-       let p = porcentagens classes 1 (head classes) (fromIntegral (length classes))
-       putStrLn (show classes)
+       let p = porcentagens (group classes) (fromIntegral (length classes))
+       putStrLn (show (group classes))
        putStrLn (show p)
 
 -- Recebe a entrada e formata em uma lista de listas, onde cada lista 
@@ -47,14 +47,14 @@ mesmaClassificacao' (x:xs) ant | x == ant = mesmaClassificacao' xs x
 mesmaClassificacao exemplos = mesmaClassificacao' classes (head classes)
                               where classes = separaClasses exemplos
 
-
-porcentagens [] count _ tam = [count/tam]
-porcentagens (x:xs) count ant tam | x == ant = porcentagens xs (count+1) x tam
-                                  | otherwise = [count/tam] ++ (porcentagens xs 1 x tam)
-                              
+-- Recebe uma lista de lista de classes e retona
+-- uma lista de porcentagens de cada classe
+porcentagens [] _ = []
+porcentagens (x:xs) tam = (fromIntegral(length x)/tam):(porcentagens xs tam)
+                   
 
 -- melhorTeste caracteristicas exemplos = 
 --                                         where classes = sort (separaClasses exemplos)
---                                               porcentagens' = porcentagens classes 1 (head classes) (fromIntegral (length classes))
+--                                               porcentagens' = porcentagens (group classes) (fromIntegral (length classes))
 
 
