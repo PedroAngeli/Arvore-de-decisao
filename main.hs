@@ -52,9 +52,13 @@ mesmaClassificacao exemplos = mesmaClassificacao' classes (head classes)
 porcentagens [] _ = []
 porcentagens (x:xs) tam = (fromIntegral(length x)/tam):(porcentagens xs tam)
                    
+-- Recebe uma lista de porcentagens de uma base de exemplos
+-- e retorna a entropia dessa base
+entropia xs = (*(-1)) (sum [x*(log x/log 2) | x<-xs]) 
 
 -- melhorTeste caracteristicas exemplos = 
 --                                         where classes = sort (separaClasses exemplos)
 --                                               porcentagens' = porcentagens (group classes) (fromIntegral (length classes))
+--                                               entropiaDaBase = entropia porcentagens'
 
 
