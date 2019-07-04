@@ -6,10 +6,15 @@ data Arv = Folha String String | No String String [Arv] deriving Show
 main = do
        entradaDescricao <- readFile "descricao.txt"
        entradaBase <- readFile "base.txt"
-       let caracteristicas = init (formataEntrada entradaDescricao)
+       let caracteristicas = formataCaracteristica (init (formataEntrada entradaDescricao)) 0
        let exemplos = formataEntrada entradaBase
-       let d = discretizar 2 exemplos
+       let d = criaListaDeValores caracteristicas exemplos
        putStrLn (show d)
+
+-- Recebe uma lista de lista de caracteristicas e retorna
+-- a de mesma lista de lista com seu indice 
+formataCaracteristica [] _ = []
+formataCaracteristica (x:xs) idx = (x,idx):formataCaracteristica xs (idx+1) 
 
 -- Recebe a entrada e formata em uma lista de listas, onde cada lista 
 -- é uma linha e cada elemento dessa lista é uma string que foi separada
@@ -78,11 +83,11 @@ discretizar idx exemplos = (listaDiscretetizada) ++ [(last listaDiscretetizada)]
                                  tuplaAgrupada = groupBy ((==) `on` snd) listaDeTuplas'
                                  listaDiscretetizada = discretizar' (tail tuplaAgrupada) (head tuplaAgrupada)
 
--- Recebe a lista de lista de caracteristicas, o idx começando em 0 e a lista de exemplos
+-- Recebe a lista de lista de caracteristicas e a lista de exemplos
 -- e retorna uma lista de lista com os valores dessas caracteristicas
-criaListaDeValores [] _ _ = []
-criaListaDeValores (x:xs) idx exemplos | (length x) == 1 = (discretizar idx exemplos):(criaListaDeValores xs (idx+1) exemplos)
-                                       | otherwise = (tail x):(criaListaDeValores xs (idx+1) exemplos)
+criaListaDeValores [] _ = []
+criaListaDeValores (x:xs) exemplos | (length (fst x)) == 1 = (discretizar (snd x) exemplos):(criaListaDeValores xs exemplos)
+                                       | otherwise = (tail (fst x)):(criaListaDeValores xs exemplos)
 
 
 --entropia' xs = (*(-1)) (sum [x*(log x/log 2) | x<-xs])
