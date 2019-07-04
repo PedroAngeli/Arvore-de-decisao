@@ -1,4 +1,5 @@
 import Data.List
+import Data.Function
 
 data Arv = Folha String String | No String String [Arv] deriving Show
 
@@ -7,8 +8,8 @@ main = do
        entradaBase <- readFile "base.txt"
        let caracteristicas = formataEntrada entradaDescricao
        let exemplos = formataEntrada entradaBase
-       let entropia' = entropia exemplos
-       putStrLn (show entropia')
+       let d = discretizar 1 exemplos
+       putStrLn (show d)
 
 -- Recebe a entrada e formata em uma lista de listas, onde cada lista 
 -- é uma linha e cada elemento dessa lista é uma string que foi separada
@@ -56,7 +57,35 @@ entropia exemplos = (*(-1)) (sum [x*(log x/log 2) | x<-xs])
                     where classes = sort (separaClasses exemplos)
                           xs = porcentagens (group classes) (fromIntegral (length classes))
 
+
+-- Recebe um indice e a lista de exemplos e 
+-- retorna uma tupla do valor da caracteristica e
+-- sua respectiva classe
+listaDeTuplas idx exemplos = [(x !! idx,last x) | x<-exemplos]
+
+
+-- Função auxiliar de discretizar
+discretizar' [] _ = []
+discretizar' (x:xs) ant = (show ((n1 + n2)/2)):discretizar' xs x
+                          where n1 = read (fst (last ant)) :: Float
+                                n2 = read (fst (head x)) :: Float
+
+-- Recebe um indice que representa o indice da caracteristica
+-- na lista de caracteristicas e recebe a base de exemplos e retorna
+-- uma lista de valores discretizados da caracteristica
+discretizar idx exemplos = (discretizar' (tail tuplaAgrupada) (head tuplaAgrupada))
+                           where listaDeTuplas' = sort (listaDeTuplas idx exemplos)
+                                 tuplaAgrupada = groupBy ((==) `on` snd) listaDeTuplas'
+
+-- Recebe a lista de lista de caracteristicas, o idx começando em 0 e a lista de exemplos
+-- e retorna uma lista de lista com os valores dessas caracteristicas
+criaListaDeValores [] _ _ = []
+criaListaDeValores (x:xs) idx exemplos | (length x) == 1 = (discretizar idx exemplos):(criaListaDeValores xs (idx+1) exemplos)
+                                       | otherwise = (tail x):(criaListaDeValores xs (idx+1) exemplos)
+
+
+--entropia' xs = (*(-1)) (sum [x*(log x/log 2) | x<-xs])
+
 -- melhorTeste caracteristicas exemplos = 
---                                         where entropiaDaBase = entropia exemplos
 
 
