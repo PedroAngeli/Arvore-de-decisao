@@ -6,9 +6,9 @@ data Arv = Folha String String | No String String [Arv] deriving Show
 main = do
        entradaDescricao <- readFile "descricao.txt"
        entradaBase <- readFile "base.txt"
-       let caracteristicas = formataEntrada entradaDescricao
+       let caracteristicas = init (formataEntrada entradaDescricao)
        let exemplos = formataEntrada entradaBase
-       let d = discretizar 1 exemplos
+       let d = discretizar 2 exemplos
        putStrLn (show d)
 
 -- Recebe a entrada e formata em uma lista de listas, onde cada lista 
@@ -73,9 +73,10 @@ discretizar' (x:xs) ant = (show ((n1 + n2)/2)):discretizar' xs x
 -- Recebe um indice que representa o indice da caracteristica
 -- na lista de caracteristicas e recebe a base de exemplos e retorna
 -- uma lista de valores discretizados da caracteristica
-discretizar idx exemplos = (discretizar' (tail tuplaAgrupada) (head tuplaAgrupada))
+discretizar idx exemplos = (listaDiscretetizada) ++ [(last listaDiscretetizada)] 
                            where listaDeTuplas' = sort (listaDeTuplas idx exemplos)
                                  tuplaAgrupada = groupBy ((==) `on` snd) listaDeTuplas'
+                                 listaDiscretetizada = discretizar' (tail tuplaAgrupada) (head tuplaAgrupada)
 
 -- Recebe a lista de lista de caracteristicas, o idx começando em 0 e a lista de exemplos
 -- e retorna uma lista de lista com os valores dessas caracteristicas
