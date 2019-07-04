@@ -7,10 +7,8 @@ main = do
        entradaBase <- readFile "base.txt"
        let caracteristicas = formataEntrada entradaDescricao
        let exemplos = formataEntrada entradaBase
-       let classes = sort (separaClasses exemplos)
-       let p = porcentagens (group classes) (fromIntegral (length classes))
-       putStrLn (show (group classes))
-       putStrLn (show p)
+       let entropia' = entropia exemplos
+       putStrLn (show entropia')
 
 -- Recebe a entrada e formata em uma lista de listas, onde cada lista 
 -- é uma linha e cada elemento dessa lista é uma string que foi separada
@@ -52,13 +50,13 @@ mesmaClassificacao exemplos = mesmaClassificacao' classes (head classes)
 porcentagens [] _ = []
 porcentagens (x:xs) tam = (fromIntegral(length x)/tam):(porcentagens xs tam)
                    
--- Recebe uma lista de porcentagens de uma base de exemplos
+-- Recebe uma base de exemplos
 -- e retorna a entropia dessa base
-entropia xs = (*(-1)) (sum [x*(log x/log 2) | x<-xs]) 
+entropia exemplos = (*(-1)) (sum [x*(log x/log 2) | x<-xs]) 
+                    where classes = sort (separaClasses exemplos)
+                          xs = porcentagens (group classes) (fromIntegral (length classes))
 
 -- melhorTeste caracteristicas exemplos = 
---                                         where classes = sort (separaClasses exemplos)
---                                               porcentagens' = porcentagens (group classes) (fromIntegral (length classes))
---                                               entropiaDaBase = entropia porcentagens'
+--                                         where entropiaDaBase = entropia exemplos
 
 
