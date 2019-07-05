@@ -2,9 +2,11 @@ module Utils where
 
 import Data.List
 import Data.Function
+import Text.Read
 
 -- Recebe uma lista de lista de caracteristicas e retorna
--- a de mesma lista de lista com seu indice 
+-- uma lista de lista de tupla cujo fst é a caracteristica
+-- e o snd é o indice da coluna correspondente
 formataCaracteristica [] _ = []
 formataCaracteristica (x:xs) idx = (x,idx):formataCaracteristica xs (idx+1) 
 
@@ -64,8 +66,8 @@ listaDeTuplas idx exemplos = [(x !! idx,last x) | x<-exemplos]
 -- Função auxiliar de discretizar
 discretizar' [] _ = []
 discretizar' (x:xs) ant = (show ((n1 + n2)/2)):discretizar' xs x
-                          where n1 = read (fst (last ant)) :: Float
-                                n2 = read (fst (head x)) :: Float
+                          where n1 = read (fst (last ant)) :: Double
+                                n2 = read (fst (head x)) :: Double
 
 -- Recebe um indice que representa o indice da caracteristica
 -- na lista de caracteristicas e recebe a base de exemplos e retorna
@@ -85,4 +87,25 @@ criaListaDeValores (x:xs) exemplos | (length (fst x)) == 1 = (discretizar (snd x
 
 --entropia' xs = (*(-1)) (sum [x*(log x/log 2) | x<-xs])
 
--- melhorTeste caracteristicas exemplos = 
+avaliaIG' (Just x) = x
+
+avaliaIG x val idx tamLista | talvez == Nothing = x == valor
+                            | tamLista == 0 = valorConvertido > xConvertido
+                            | otherwise =  valorConvertido <= xConvertido 
+                            where valor = (val !! idx)
+                                  talvez = (readMaybe x) :: Maybe Double
+                                  xConvertido = avaliaIG' talvez
+                                  valorConvertido = read valor :: Double
+                                  
+
+-- Recebe uma lista de valores ["Sol","Chuva","Nublado"],
+-- uma base de exemplos e o indice da caracteristica, ou seja
+-- sua coluna correspondente
+ig' [] _ _ = []
+ig' (x:xs) exemplos idx = ((tamListaGerada/tamBaseDeExemplos) * (entropia listaGerada)):(ig' xs exemplos idx)
+                       where listaGerada = [val | val<-exemplos, (avaliaIG x val idx (length xs))]
+                             tamListaGerada = fromIntegral(length listaGerada) 
+                             tamBaseDeExemplos = fromIntegral(length exemplos)
+
+
+                            
