@@ -52,7 +52,7 @@ porcentagens (x:xs) tam = (fromIntegral(length x)/tam):(porcentagens xs tam)
                    
 -- Recebe uma base de exemplos
 -- e retorna a entropia dessa base
-entropia exemplos = (*(-1)) (sum [x*(log x/log 2) | x<-xs]) 
+entropia exemplos = (*(-1)) (sum [x*((lgq' x)/log 2) | x<-xs]) 
                     where classes = sort (separaClasses exemplos)
                           xs = porcentagens (group classes) (fromIntegral (length classes))
 
@@ -87,25 +87,57 @@ criaListaDeValores (x:xs) exemplos | (length (fst x)) == 1 = (discretizar (snd x
 
 --entropia' xs = (*(-1)) (sum [x*(log x/log 2) | x<-xs])
 
+
+
+-- Recebe uma lista de valores ["Sol","Chuva","Nublado"],
+-- uma base de exemplos e o indice da caracteristica, ou seja
+-- sua coluna correspondente e retorna o valor de ig dessa caracteristica
+ig valores exemplos idx = (entropia exemplos) - (sum (ig' valores exemplos idx "-Infinity"))
+
+
 avaliaIG' (Just x) = x
 
-avaliaIG x val idx tamLista | talvez == Nothing = x == valor
+--Verifica se a carecteristica é numerica ou nominal
+avaliaIG x val idx tamLista xant | talvez == Nothing = x == valor
                             | tamLista == 0 = valorConvertido > xConvertido
-                            | otherwise =  valorConvertido <= xConvertido 
+                            | otherwise =  (valorConvertido <= xConvertido) && (valorConvertido > xAntConvertido)
                             where valor = (val !! idx)
                                   talvez = (readMaybe x) :: Maybe Double
                                   xConvertido = avaliaIG' talvez
                                   valorConvertido = read valor :: Double
+                                  xAntConvertido = read xant :: Double
                                   
-
 -- Recebe uma lista de valores ["Sol","Chuva","Nublado"],
 -- uma base de exemplos e o indice da caracteristica, ou seja
--- sua coluna correspondente
-ig' [] _ _ = []
-ig' (x:xs) exemplos idx = ((tamListaGerada/tamBaseDeExemplos) * (entropia listaGerada)):(ig' xs exemplos idx)
-                       where listaGerada = [val | val<-exemplos, (avaliaIG x val idx (length xs))]
+-- sua coluna correspondente e retorna uma lista que representa
+-- cada item do somatorio
+ig' [] _ _ _= []
+ig' (x:xs) exemplos idx xant = ((tamListaGerada/tamBaseDeExemplos) * (entropia listaGerada)):(ig' xs exemplos idx x)
+                       where listaGerada = listaGerada' exemplos x idx xs xant
                              tamListaGerada = fromIntegral(length listaGerada) 
                              tamBaseDeExemplos = fromIntegral(length exemplos)
 
+listaGerada' exemplos x idx xs xant = [val | val<-exemplos, (avaliaIG x val idx (length xs) xant)]
+
+
+-- Recebe uma lista de valores ["Sol","Chuva","Nublado"],
+-- uma base de exemplos e o indice da caracteristica, ou seja
+-- sua coluna correspondente e retorna o valor de iv dessa caracteristica
+iv valores exemplos idx = -(sum (iv' valores exemplos idx "-Infinity"))
+
+-- Recebe uma lista de valores ["Sol","Chuva","Nublado"],
+-- uma base de exemplos e o indice da caracteristica, ou seja
+-- sua coluna correspondente e retorna uma lista que representa
+-- cada item do somatorio
+iv' [] _ _ _= []
+iv' (x:xs) exemplos idx xant = (quociente * (lgq/log 2)):(iv' xs exemplos idx x)
+                              where listaGerada = listaGerada' exemplos x idx xs xant
+                                    tamListaGerada = fromIntegral(length listaGerada) 
+                                    tamBaseDeExemplos = fromIntegral(length exemplos)
+                                    quociente = (tamListaGerada/tamBaseDeExemplos)
+                                    lgq = lgq' quociente
+
+lgq' quociente | quociente == 0 = 0
+               | otherwise = log quociente
 
                             
