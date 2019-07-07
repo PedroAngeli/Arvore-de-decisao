@@ -140,4 +140,25 @@ iv' (x:xs) exemplos idx xant = (quociente * (lgq/log 2)):(iv' xs exemplos idx x)
 lgq' quociente | quociente == 0 = 0
                | otherwise = log quociente
 
+-- Recebe a lista de caracteristicas, a lista de exemplos
+-- e os valores de cada caracteristica e retorna uma lista
+-- de tupla (igr, caracteristica)
+calculaIgr [] _ _  = []
+calculaIgr (x:xs) exemplos (y:ys) = (igr',caracteristica):(calculaIgr xs exemplos ys)
+                                    where igr' = igr y exemplos idx
+                                          idx = snd x
+                                          caracteristica = head (fst x)
+
+igr valores exemplos idx = if iv' == 0 then 0
+                           else ig'/iv'
+                           where
+                           ig' = (ig valores exemplos idx)
+                           iv' = (iv valores exemplos idx)
+
+
+-- Recebe a lista de caracteristicas, a lista de exemplos
+-- e os valores de cada caracteristica e retorna uma string
+-- que representa a melhor caracteristica
+melhorTeste caracteristicas exemplos valores = snd (last (sort listaDeTuplas)) 
+                                                where listaDeTuplas = (calculaIgr caracteristicas exemplos valores)
                             
