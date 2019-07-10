@@ -95,7 +95,7 @@ criaListaDeValores (x:xs) exemplos | (length (fst x)) == 1 = (discretizar (snd x
 ig valores exemplos idx = (entropia exemplos) - (sum (ig' valores exemplos idx "-Infinity"))
 
 
-avaliaIG' (Just x) = x
+converteMaybe (Just x) = x
 
 --Verifica se a carecteristica é numerica ou nominal
 avaliaIG x val idx tamLista xant | talvez == Nothing = x == valor
@@ -103,7 +103,7 @@ avaliaIG x val idx tamLista xant | talvez == Nothing = x == valor
                             | otherwise =  (valorConvertido <= xConvertido) && (valorConvertido > xAntConvertido)
                             where valor = (val !! idx)
                                   talvez = (readMaybe x) :: Maybe Double
-                                  xConvertido = avaliaIG' talvez
+                                  xConvertido = converteMaybe talvez
                                   valorConvertido = read valor :: Double
                                   xAntConvertido = read xant :: Double
                                   
