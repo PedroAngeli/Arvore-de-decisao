@@ -67,8 +67,50 @@ separaExemplos (x:xs) idxMelhor vi tam flag ant | flag == False = if valor == vi
 
 tiraMelhor melhor (x:xs) | melhor == head(fst x) = xs
                          | otherwise = x:(tiraMelhor melhor xs)
+--Recebe um no interno ou folha e retorna
+--seu valor "resposta"
+respostaDoNo (Folha p r) = r
+respostaDoNo (No p r xs) = r
+
+perguntaDoNo (Folha p r) = p
+perguntaDoNo (No p r xs) = p
 
 valorDoNo (Folha p r) = r
 valorDoNo (No p r xs) = r
 
+filhosDoNo (No p r xs) = xs
+
+avaliaCaso (Folha p r) _ _ = p
+avaliaCaso (No p r xs) caracteristicas caso = avaliaCaso filho caracteristicas caso
+                                              where idx = achaIndicePergunta p caracteristicas
+                                                    valorCaso = (caso !! idx)
+                                                    flag = ehNumerica valorCaso
+                                                    filho = filhoCorrespondente valorCaso xs flag "-Infinity"
+
+achaIndicePergunta pergunta (x:xs) | pergunta == head (fst x) = snd x
+                                   | otherwise = achaIndicePergunta pergunta xs
+
+
+filhoCorrespondente valorCaso (x:xs) flag ant | flag == False = if (valorDoNo x) == valorCaso then x else filhoCorrespondente valorCaso xs flag ant
+                                              | (length xs) > 0 = if (valorCasoConvertido > antConvertido) && (valorCasoConvertido <= valorNoConvertido) then x else filhoCorrespondente valorCaso xs flag (valorDoNo x)
+                                              | otherwise = x
+                                              where valorCasoConvertido = converteMaybe ((readMaybe valorCaso) :: Maybe Double)
+                                                    antConvertido = converteMaybe ((readMaybe ant) :: Maybe Double)
+                                                    valorNoConvertido = converteMaybe ((readMaybe (valorDoNo x)) :: Maybe Double)
+
+
+                                        
+
+printaSeNao esp = esp ++ "senao\n"
+printaFimSe esp = esp ++ "fim-se\n"
+
+imprime (Folha p r) esp _ _ _ _= esp ++ "retorne " ++ p ++ "\n"
+imprime (No p r xs) esp pergunta resposta ys ant | ehNumerica resposta == False = esp ++ "se " ++ pergunta ++ " = " ++ resposta ++ " entao\n"
+                                              | otherwise = if length ys == 0 then esp ++ "se " ++ pergunta ++ " > " ++ resposta ++ " entao\n" else if ehNumerica ant == False then esp ++ "se " ++ pergunta ++ " <= " ++ resposta ++ " entao\n" else esp ++ "se " ++ ant ++ " < " ++ pergunta ++ " <= " ++ resposta ++ " entao\n"
+
+imprimeNo (Folha p r) esp _= imprime (Folha p r) esp p r p r
+imprimeNo (No p r xs) esp ant = imprime' xs (No p r xs) esp ant
+
+imprime' [] _ _ _ = ""
+imprime' (x:xs) (No p r ys) esp ant = imprime (No p r ys) esp p (respostaDoNo x) xs ant ++ imprimeNo x (esp ++ "   ") ant ++ if length xs == 0 then printaFimSe esp else printaSeNao esp ++ imprime' xs (No p r ys) (esp ++ "   ") (respostaDoNo x) ++ printaFimSe esp
 
